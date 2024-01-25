@@ -1,5 +1,5 @@
 {
-    "name": "josemalonsom/ifx4dd",
+    "name": "belloxy/ifx4dd",
     "description": "Informix Platform for Doctrine DBAL",
     "keywords": ["informix", "doctrine", "dbal", "database", "persistence", "queryobject"],
     "homepage": "http://www.github.com/josemalonsom/ifx4dd",
