@@ -19,9 +19,12 @@
 
 namespace Doctrine\DBAL\Driver;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\API\ExceptionConverter;
+use Doctrine\DBAL\Driver\API\Informix;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\InformixPlatform;
 use Doctrine\DBAL\Schema\InformixSchemaManager;
 use Doctrine\DBAL\VersionAwarePlatformDriver;
@@ -31,18 +34,8 @@ use Doctrine\DBAL\VersionAwarePlatformDriver;
  * for IBM Informix based drivers.
  *
  */
-abstract class AbstractInformixDriver implements Driver, ExceptionConverterDriver, VersionAwarePlatformDriver
+abstract class AbstractInformixDriver implements VersionAwarePlatformDriver
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getDatabase(\Doctrine\DBAL\Connection $conn)
-    {
-        $params = $conn->getParams();
-
-        return $params['dbname'];
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -54,76 +47,16 @@ abstract class AbstractInformixDriver implements Driver, ExceptionConverterDrive
     /**
      * {@inheritdoc}
      */
-    public function getSchemaManager(\Doctrine\DBAL\Connection $conn)
+    public function getSchemaManager(Connection $conn, AbstractPlatform $platform)
     {
-        return new InformixSchemaManager($conn);
+        assert($platform instanceof InformixPlatform);
+
+        return new InformixSchemaManager($conn, $platform);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function convertException($message, DriverException $exception)
+    public function getExceptionConverter(): ExceptionConverter
     {
-
-        switch ( $exception->getErrorCode() ) {
-            case '-239':
-            case '-268':
-                return new Exception\UniqueConstraintViolationException($message, $exception);
-
-            case '-206':
-                return new Exception\TableNotFoundException($message, $exception);
-
-            case '-310':
-                return new Exception\TableExistsException($message, $exception);
-
-            case '-691':
-            case '-692':
-            case '-26018':
-                return new Exception\ForeignKeyConstraintViolationException($message, $exception);
-
-            case '-391':
-                return new Exception\NotNullConstraintViolationException($message, $exception);
-
-            case '-217':
-                return new Exception\InvalidFieldNameException($message, $exception);
-
-            case '-324':
-                return new Exception\NonUniqueFieldNameException($message, $exception);
-
-            case '-201':
-                return new Exception\SyntaxErrorException($message, $exception);
-
-            case '-908':
-            case '-930':
-            case '-951':
-                return new Exception\ConnectionException($message, $exception);
-
-        }
-
-        // In some cases the exception doesn't have the driver-specific error code
-
-        if ( self::isErrorAccessDeniedMessage($exception->getMessage()) ) {
-            return new Exception\ConnectionException($message, $exception);
-        }
-
-        return new Exception\DriverException($message, $exception);
-    }
-
-    /**
-     * Checks if a message means an "access denied error".
-     *
-     * @param string
-     * @return boolean
-     */
-    protected static function isErrorAccessDeniedMessage($message)
-    {
-        if ( strpos($message, 'Incorrect password or user') !== false ||
-            strpos($message, 'Cannot connect to database server') !== false ||
-            preg_match('/Attempt to connect to database server (.*) failed/', $message) ) {
-            return true;
-        }
-
-        return false;
+        return new Informix\ExceptionConverter();
     }
 
     /**
@@ -141,7 +74,7 @@ abstract class AbstractInformixDriver implements Driver, ExceptionConverterDrive
             (?P<level>[[:alnum:]]+)/x';
 
         if ( ! preg_match($regex, $version, $versionParts) ) {
-            throw DBALException::invalidPlatformVersionSpecified(
+            throw Exception::invalidPlatformVersionSpecified(
                 $version,
                 '<server_type> Version <major>.<minor><os><level>'
             );

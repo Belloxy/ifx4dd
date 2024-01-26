@@ -24,9 +24,6 @@ use Doctrine\DBAL\Events;
 
 /**
  * Informix Schema Manager.
- *
- * @author Jose M. Alonso M.  <josemalonsom@yahoo.es>
- * @link   www.doctrine-project.org
  */
 class InformixSchemaManager extends AbstractSchemaManager
 {

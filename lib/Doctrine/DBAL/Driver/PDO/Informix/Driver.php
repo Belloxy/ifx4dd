@@ -17,10 +17,13 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\DBAL\Driver\PDOInformix;
+namespace Doctrine\DBAL\Driver\PDO\Informix;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\AbstractInformixDriver;
+use Doctrine\DBAL\Driver\PDO\Connection;
+use Doctrine\DBAL\Driver\PDO\Exception;
+use PDO;
 
 /**
  * Driver for the PDO Informix extension.
@@ -76,26 +79,34 @@ class Driver extends AbstractInformixDriver
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function connect(array $params, $username = null, $password = null, array $driverOptions = array())
+    public function connect(
+        #[SensitiveParameter]
+        array $params
+    )
     {
-
-        $dsn = $this->constructPdoDsn($params);
-
+        $driverOptions = $params['driverOptions'] ?? [];
         $driverOptions += array(\PDO::ATTR_STRINGIFY_FETCHES => true);
 
-        try {
+        if (! empty($params['persistent'])) {
+            $driverOptions[PDO::ATTR_PERSISTENT] = true;
+        }
 
-            return new \Doctrine\DBAL\Driver\PDOInformix\Connection(
-                $dsn,
-                $username,
-                $password,
+        $safeParams = $params;
+        unset($safeParams['password'], $safeParams['url']);
+
+        try {
+            $pdo = new PDO(
+                $this->constructPdoDsn($safeParams),
+                $params['user'] ?? '',
+                $params['password'] ?? '',
                 $driverOptions
             );
 
         } catch (\Exception $e) {
-            throw DBALException::driverException($this, $e);
+            throw Exception::new($exception);
         }
 
+        return new Connection($pdo);
     }
 
     /**
@@ -110,25 +121,25 @@ class Driver extends AbstractInformixDriver
     {
 
         if ( empty($params['dbname']) ) {
-            throw DBALException::driverException($this,
+            throw Exception::new($this,
                 new \Exception("Missing 'dbname' in configuration for informix driver")
             );
         }
 
         if ( empty($params['host']) ) {
-            throw DBALException::driverException($this,
+            throw Exception::new($this,
                 new \Exception("Missing 'host' in configuration for informix driver")
             );
         }
 
         if ( empty($params['protocol']) ) {
-            throw DBALException::driverException($this,
+            throw Exception::new($this,
                 new \Exception("Missing 'protocol' in configuration for informix driver")
             );
         }
 
         if ( empty($params['server']) ) {
-            throw DBALException::driverException($this,
+            throw Exception::new($this,
                 new \Exception("Missing 'server' in configuration for informix driver")
             );
         }

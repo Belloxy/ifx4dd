@@ -1,7 +1,7 @@
 
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
-# DEPRECATED Informix Platform for Doctrine DBAL
+# Informix Platform for Doctrine DBAL
 
 The *Informix Platform for Doctrine DBAL*  gives support for Informix to
 [Doctrine\DBAL](http://www.doctrine-project.org/projects/dbal.html) the database
@@ -9,17 +9,11 @@ abstraction layer of the [Doctrine project](http://www.doctrine-project.org).
 
 ## DBAL versions supported
 
-|  DBAL   | ifx4dd  |     |
-|:-------:|:-------:|:---:|
-|  [master](https://github.com/doctrine/dbal) |  [master](https://github.com/josemalonsom/ifx4dd) | [![Build Status](http://vps195060.ovh.net/job/ifx4dd/badge/icon)](http://vps195060.ovh.net/job/ifx4dd) |
-|  [2.6](https://github.com/doctrine/dbal/tree/2.6)    |  [1.1](https://github.com/josemalonsom/ifx4dd/tree/1.1) | [![Build Status](http://vps195060.ovh.net/job/ifx4dd-1.1/badge/icon)](http://vps195060.ovh.net/job/ifx4dd-1.1) |
-|  [2.5](https://github.com/doctrine/dbal/tree/2.5)    |  [1.0](https://github.com/josemalonsom/ifx4dd/tree/1.0) | [![Build Status](http://vps195060.ovh.net/job/ifx4dd-1.0/badge/icon)](http://vps195060.ovh.net/job/ifx4dd-1.0) |
-
-
-## Informix versions supported
-
-Tested on Informix Dynamic Server versions 11.70 and 12.10 (right now it's not
-tested on 11.50 but should work anyway).
+|                            DBAL                            | ifx4dd  |     |
+|:----------------------------------------------------------:|:-------:|:---:|
+| [3.8](https://github.com/doctrine/dbal/releases/tag/3.8.0) |  [master](https://github.com/josemalonsom/ifx4dd) | [![Build Status](http://vps195060.ovh.net/job/ifx4dd/badge/icon)](http://vps195060.ovh.net/job/ifx4dd) |
+|      [2.6](https://github.com/doctrine/dbal/tree/2.6)      |  [1.1](https://github.com/josemalonsom/ifx4dd/tree/1.1) | [![Build Status](http://vps195060.ovh.net/job/ifx4dd-1.1/badge/icon)](http://vps195060.ovh.net/job/ifx4dd-1.1) |
+|      [2.5](https://github.com/doctrine/dbal/tree/2.5)      |  [1.0](https://github.com/josemalonsom/ifx4dd/tree/1.0) | [![Build Status](http://vps195060.ovh.net/job/ifx4dd-1.0/badge/icon)](http://vps195060.ovh.net/job/ifx4dd-1.0) |
 
 
 ## INSTALL

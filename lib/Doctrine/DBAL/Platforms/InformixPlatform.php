@@ -28,6 +28,7 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
+use Doctrine\DBAL\Schema\UniqueConstraint;
 
 /**
  * The InformixPlatform provides the behavior, features and SQL dialect of the
@@ -38,7 +39,6 @@ use Doctrine\DBAL\Schema\TableDiff;
  */
 class InformixPlatform extends AbstractPlatform
 {
-
     /**
      * {@inheritDoc}
      */
@@ -61,30 +61,30 @@ class InformixPlatform extends AbstractPlatform
     public function initializeDoctrineTypeMappings()
     {
         $this->doctrineTypeMapping = array(
-            'bigint'            => 'bigint',
-            'bigserial'         => 'bigint',
-            'blob'              => 'blob',
-            'boolean'           => 'boolean',
-            'byte'              => 'binary',
-            'char'              => 'string',
-            'clob'              => 'text',
-            'date'              => 'date',
-            'datetime'          => 'datetime',
-            'decimal'           => 'decimal',
-            'float'             => 'float',
-            'int8'              => 'bigint',
-            'integer'           => 'integer',
-            'lvarchar'          => 'text',
-            'money'             => 'decimal',
-            'nchar'             => 'string',
-            'nvarchar'          => 'string',
-            'serial8'           => 'bigint',
-            'serial'            => 'integer',
-            'smallfloat'        => 'float',
-            'smallint'          => 'smallint',
-            'text'              => 'text',
-            'time'              => 'time',
-            'varchar'           => 'string',
+            'bigint' => 'bigint',
+            'bigserial' => 'bigint',
+            'blob' => 'blob',
+            'boolean' => 'boolean',
+            'byte' => 'binary',
+            'char' => 'string',
+            'clob' => 'text',
+            'date' => 'date',
+            'datetime' => 'datetime',
+            'decimal' => 'decimal',
+            'float' => 'float',
+            'int8' => 'bigint',
+            'integer' => 'integer',
+            'lvarchar' => 'text',
+            'money' => 'decimal',
+            'nchar' => 'string',
+            'nvarchar' => 'string',
+            'serial8' => 'bigint',
+            'serial' => 'integer',
+            'smallfloat' => 'float',
+            'smallint' => 'smallint',
+            'text' => 'text',
+            'time' => 'time',
+            'varchar' => 'string',
         );
     }
 
@@ -360,6 +360,11 @@ class InformixPlatform extends AbstractPlatform
     public function getTimeTypeDeclarationSQL(array $fieldDeclaration)
     {
         return 'DATETIME HOUR TO SECOND';
+    }
+
+    public function getCurrentDatabaseExpression(): string
+    {
+        return 'DBINFO(\'dbname\')';
     }
 
     /**
@@ -835,7 +840,7 @@ class InformixPlatform extends AbstractPlatform
     {
         /*
          * Informix creates an automatic index in ascending order for the
-         * unique, primary-key and referencial constraints. If you try to 
+         * unique, primary-key and referencial constraints. If you try to
          * create an specific index in the same column or columns that fits
          * with the automatic index the database server returns an error. When
          * the index exists before the creation of the constraint, if is
@@ -1105,7 +1110,7 @@ class InformixPlatform extends AbstractPlatform
     /**
      * {@inheritDoc}
      */
-    public function getUniqueConstraintDeclarationSQL($name, Index $index)
+    public function getUniqueConstraintDeclarationSQL($name, UniqueConstraint $constraint)
     {
         $columns = $index->getQuotedColumns($this);
         $name    = new Identifier($name);
@@ -1114,7 +1119,7 @@ class InformixPlatform extends AbstractPlatform
             throw new \InvalidArgumentException("Incomplete definition. 'columns' required.");
         }
 
-        return 'UNIQUE (' . $this->getIndexFieldDeclarationListSQL($columns)
+        return 'UNIQUE (' . $this->getColumnsFieldDeclarationListSQL($columns)
             . ') CONSTRAINT ' . $name->getQuotedName($this);
     }
 
@@ -1237,37 +1242,37 @@ class InformixPlatform extends AbstractPlatform
         $timeUnit = '';
 
         switch($unit) {
-            case self::DATE_INTERVAL_UNIT_SECOND:
+            case DateIntervalUnit::SECOND:
                 $timeUnit = 'SECOND';
                 break;
 
-            case self::DATE_INTERVAL_UNIT_MINUTE:
+            case DateIntervalUnit::MINUTE:
                 $timeUnit = 'MINUTE';
                 break;
 
-            case self::DATE_INTERVAL_UNIT_HOUR:
+            case DateIntervalUnit::HOUR:
                 $timeUnit = 'HOUR';
                 break;
 
-            case self::DATE_INTERVAL_UNIT_DAY:
+            case DateIntervalUnit::DAY:
                 $timeUnit = 'DAY';
                 break;
 
-            case self::DATE_INTERVAL_UNIT_WEEK:
+            case DateIntervalUnit::WEEK:
                 $timeUnit = 'DAY';
                 $interval *= 7;
                 break;
 
-            case self::DATE_INTERVAL_UNIT_MONTH:
+            case DateIntervalUnit::MONTH:
                 $timeUnit = 'MONTH';
                 break;
 
-            case self::DATE_INTERVAL_UNIT_QUARTER:
+            case DateIntervalUnit::QUARTER:
                 $timeUnit = 'MONTH';
                 $interval *= 3;
                 break;
 
-            case self::DATE_INTERVAL_UNIT_YEAR:
+            case DateIntervalUnit::YEAR:
                 $timeUnit = 'YEAR';
                 break;
         }
